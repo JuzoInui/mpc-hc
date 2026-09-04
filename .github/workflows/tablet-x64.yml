@@ -23,7 +23,7 @@ jobs:
       - name: Configure native build tools
         shell: powershell
         run: |
-          & C:\msys64\usr\bin\bash.exe -lc "pacman -S --needed --noconfirm make diffutils pkgconf mingw-w64-x86_64-gcc"
+          & C:\msys64\usr\bin\bash.exe -lc "pacman -S --needed --noconfirm make diffutils pkgconf mingw-w64-x86_64-gcc mingw-w64-x86_64-bzip2"
 
           $mingwCompat = "C:\msys64\mingw64\x86_64-w64-mingw32\lib"
           New-Item -ItemType Directory -Force $mingwCompat | Out-Null
