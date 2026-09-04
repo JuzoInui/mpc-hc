@@ -25,6 +25,17 @@ jobs:
         run: |
           & C:\msys64\usr\bin\bash.exe -lc "pacman -S --needed --noconfirm make diffutils pkgconf mingw-w64-x86_64-gcc mingw-w64-x86_64-bzip2"
 
+          # The bundled LAV/FFmpeg scripts expect GNU binutils with a cross-tool
+          # prefix, while current MSYS2 also exposes several of them unprefixed.
+          $binutils = @("ar", "nm", "objcopy", "objdump", "ranlib", "strip", "windres", "dlltool", "as", "ld")
+          foreach ($tool in $binutils) {
+            $source = "C:\msys64\mingw64\bin\$tool.exe"
+            $target = "C:\msys64\mingw64\bin\x86_64-w64-mingw32-$tool.exe"
+            if ((Test-Path $source) -and -not (Test-Path $target)) {
+              Copy-Item $source $target
+            }
+          }
+
           $mingwCompat = "C:\msys64\mingw64\x86_64-w64-mingw32\lib"
           New-Item -ItemType Directory -Force $mingwCompat | Out-Null
           Copy-Item "C:\msys64\mingw64\lib\libmingwex.a" $mingwCompat -Force
