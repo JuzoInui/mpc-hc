@@ -20,6 +20,27 @@ jobs:
         shell: powershell
         run: choco install nasm yasm --yes --no-progress
 
+      - name: Configure native build tools
+        shell: powershell
+        run: |
+          & C:\msys64\usr\bin\bash.exe -lc "pacman -S --needed --noconfirm make diffutils pkgconf mingw-w64-x86_64-gcc"
+
+          $nasm = Get-ChildItem "$env:ChocolateyInstall\lib\nasm" -Filter nasm.exe -Recurse |
+            Select-Object -First 1
+          $yasm = Get-ChildItem "$env:ChocolateyInstall\lib\yasm" -Filter yasm.exe -Recurse |
+            Select-Object -First 1
+          if (-not $nasm -or -not $yasm) {
+            throw "NASM or YASM executable was not found after installation."
+          }
+
+          $nasm.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $yasm.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "MPCHC_MSYS=C:\msys64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "MPCHC_MINGW64=C:\msys64\mingw64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "MSYS2_PATH_TYPE=inherit" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
 
