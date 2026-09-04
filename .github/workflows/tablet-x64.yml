@@ -1,0 +1,39 @@
+name: Build MPC-HC Tablet x64
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - tablet-frame
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install assembler tools
+        shell: powershell
+        run: choco install nasm yasm --yes --no-progress
+
+      - name: Build x64 release
+        shell: cmd
+        run: build.bat Build x64 Main Release Lite
+
+      - name: Collect portable player
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force artifact
+          Copy-Item bin\mpc-hc_x64\mpc-hc64.exe artifact\
+          Copy-Item TABLET_BUILD.md artifact\
+
+      - name: Upload portable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: mpc-hc-tablet-win10-x64
+          path: artifact
+          if-no-files-found: error

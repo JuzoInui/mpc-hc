@@ -41,6 +41,7 @@
 #include "PlayerPreView.h"
 #include "PlayerToolBar.h"
 #include "SubtitleDlDlg.h"
+#include "TabletFrameWnd.h"
 #include "TimerWrappers.h"
 #include "OSD.h"
 #include "CMPCThemeMenu.h"
@@ -877,6 +878,7 @@ protected:  // control bar embedded members
     friend class CPlayerBar; // it notifies m_controls of panel re-dock
 
     CChildView m_wndView;
+    CTabletFrameWnd m_wndTabletFrame;
 
     CPlayerSeekBar m_wndSeekBar;
     CPlayerToolBar m_wndToolBar;
@@ -921,6 +923,7 @@ public:
     afx_msg void OnEnterSizeMove();
     afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
     afx_msg void OnSize(UINT nType, int cx, int cy);
+    afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
     afx_msg void OnSizing(UINT nSide, LPRECT lpRect);
     afx_msg void OnExitSizeMove();
     afx_msg void OnDisplayChange();

@@ -397,6 +397,7 @@
     </ClCompile>
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="TabletFrameWnd.cpp" />
     <ClCompile Include="MainFrmControls.cpp" />
     <ClCompile Include="mplayerc.cpp" />
     <ClCompile Include="Profile.cpp" />
@@ -973,6 +974,7 @@
     </ClInclude>
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="TabletFrameWnd.h" />
     <ClInclude Include="MainFrmControls.h" />
     <ClInclude Include="mplayerc.h" />
     <ClInclude Include="Profile.h" />
