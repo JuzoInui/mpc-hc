@@ -27,6 +27,7 @@ jobs:
         shell: powershell
         run: |
           $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" -Directory |
+            Where-Object Name -Match '^\d+\.\d+\.\d+\.\d+$' |
             Sort-Object Name -Descending |
             Select-Object -First 1 -ExpandProperty Name
           if (-not $sdk) {
