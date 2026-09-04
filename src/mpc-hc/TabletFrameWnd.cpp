@@ -163,7 +163,7 @@ void CTabletFrameWnd::OnPaint()
 
     CRgn clipRegion;
     clipRegion.CreateRectRgn(0, 0, 0, 0);
-    if (GetWindowRgn(&clipRegion) != ERROR) {
+    if (GetWindowRgn(static_cast<HRGN>(clipRegion.GetSafeHandle())) != ERROR) {
         CBrush bodyBrush(kBodyColor);
         dc.FillRgn(&clipRegion, &bodyBrush);
     }
