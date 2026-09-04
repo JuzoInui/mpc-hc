@@ -96,7 +96,7 @@ jobs:
           if (-not $lavBase) {
             throw "Unable to determine the LAVFilters history root."
           }
-          & git -C $lavRoot tag --force tablet-build-base $lavBase
+          & git -C $lavRoot tag --annotate --force tablet-build-base --message "CI build base" $lavBase
 
           & msbuild src\thirdparty\freetype2\freetype2.vcxproj /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /p:MPCHC_WINSDK_VER=$env:MPCHC_WINSDK_VER
           if ($LASTEXITCODE -ne 0) {
