@@ -1961,6 +1961,12 @@ void CAppSettings::LoadSettings()
 
     eModernThemeMode = static_cast<CMPCTheme::ModernThemeMode>(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MODERNTHEMEMODE, static_cast<int>(CMPCTheme::ModernThemeMode::WINDOWSDEFAULT)));
 
+    // This custom build presents MPC-HC as the screen of a dark tablet.
+    // Keep the player chrome consistent even when Windows uses its light theme
+    // or an existing MPC-HC profile contains a different theme preference.
+    bMPCTheme = true;
+    eModernThemeMode = CMPCTheme::ModernThemeMode::DARK;
+
     iFullscreenDelay = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREEN_DELAY, MIN_FULLSCREEN_DELAY);
     if (iFullscreenDelay < MIN_FULLSCREEN_DELAY || iFullscreenDelay > MAX_FULLSCREEN_DELAY) {
         iFullscreenDelay = MIN_FULLSCREEN_DELAY;

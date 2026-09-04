@@ -24,9 +24,9 @@ protected:
 private:
     CWnd* m_pOwner = nullptr;
     int m_scale = 100;
-    int m_bezel = 16;
-    int m_hardwareHeight = 8;
-    int m_cornerRadius = 28;
+    int m_bezel = 20;
+    int m_hardwareHeight = 9;
+    int m_cornerRadius = 30;
     int m_strokeWidth = 2;
 
     CRect m_volumeButtonRect;

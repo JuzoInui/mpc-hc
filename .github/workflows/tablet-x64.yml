@@ -88,6 +88,21 @@ jobs:
           "MPCHC_WINSDK_VER=$sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Host "Using Windows SDK $sdk"
 
+      - name: Prepare legacy full-build dependencies
+        shell: powershell
+        run: |
+          $lavRoot = "src\thirdparty\LAVFilters\src"
+          $lavBase = (& git -C $lavRoot rev-list --max-parents=0 HEAD | Select-Object -First 1).Trim()
+          if (-not $lavBase) {
+            throw "Unable to determine the LAVFilters history root."
+          }
+          & git -C $lavRoot tag --force tablet-build-base $lavBase
+
+          & msbuild src\thirdparty\freetype2\freetype2.vcxproj /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /p:MPCHC_WINSDK_VER=$env:MPCHC_WINSDK_VER
+          if ($LASTEXITCODE -ne 0) {
+            throw "FreeType prerequisite build failed."
+          }
+
       - name: Build x64 release
         shell: cmd
         run: |
