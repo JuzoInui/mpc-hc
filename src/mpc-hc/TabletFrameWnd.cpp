@@ -61,7 +61,7 @@ void CTabletFrameWnd::UpdateMetrics()
     }
 
     m_scale = MulDiv(dpi, 100, 96);
-    m_bezel = Scale(20);
+    m_bezel = Scale(12);
     m_hardwareHeight = Scale(9);
     m_cornerRadius = Scale(30);
     m_strokeWidth = std::max(1, Scale(2));
@@ -83,6 +83,19 @@ void CTabletFrameWnd::SyncToOwner(bool showFrame)
 
     CRect ownerRect;
     m_pOwner->GetWindowRect(ownerRect);
+
+    // The standard resizable Windows frame is part of the owner window, but
+    // not part of its client area.  If the tablet opening follows the full
+    // window rectangle, those non-client strips look like empty gaps beside
+    // and below the video.  Measure them at the current DPI and let the tablet
+    // body cover them while retaining WS_THICKFRAME for native resizing.
+    CRect ownerClientRect;
+    m_pOwner->GetClientRect(ownerClientRect);
+    m_pOwner->ClientToScreen(ownerClientRect);
+    m_ownerInsetLeft = std::max(0, ownerClientRect.left - ownerRect.left);
+    m_ownerInsetRight = std::max(0, ownerRect.right - ownerClientRect.right);
+    m_ownerInsetBottom = std::max(0, ownerRect.bottom - ownerClientRect.bottom);
+
     const CRect frameRect(
         ownerRect.left - m_bezel,
         ownerRect.top - m_bezel - m_hardwareHeight,
@@ -126,12 +139,16 @@ void CTabletFrameWnd::RebuildWindowRegion()
         m_cornerRadius * 2,
         m_cornerRadius * 2);
 
+    const int openingLeft = m_bezel + m_ownerInsetLeft;
+    const int openingRight = clientRect.right - m_bezel - m_ownerInsetRight;
+    const int openingBottom = clientRect.bottom - m_bezel - m_ownerInsetBottom;
+
     CRgn centerHole;
     centerHole.CreateRoundRectRgn(
-        m_bezel,
+        openingLeft,
         bodyTop + m_bezel,
-        clientRect.right - m_bezel + 1,
-        clientRect.bottom - m_bezel + 1,
+        openingRight + 1,
+        openingBottom + 1,
         Scale(11),
         Scale(11));
     windowRegion.CombineRgn(&windowRegion, &centerHole, RGN_DIFF);
@@ -195,10 +212,10 @@ void CTabletFrameWnd::OnPaint()
     dc.SelectObject(&innerPen);
     dc.SelectStockObject(NULL_BRUSH);
     dc.RoundRect(CRect(
-        m_bezel - 1,
+        m_bezel + m_ownerInsetLeft - 1,
         m_hardwareHeight + m_bezel - 1,
-        clientRect.right - m_bezel + 1,
-        clientRect.bottom - m_bezel + 1),
+        clientRect.right - m_bezel - m_ownerInsetRight + 1,
+        clientRect.bottom - m_bezel - m_ownerInsetBottom + 1),
         CPoint(Scale(11), Scale(11)));
 
     // Small camera and speaker details make the bezel read as a physical
@@ -206,14 +223,14 @@ void CTabletFrameWnd::OnPaint()
     CBrush cameraBrush(kCameraColor);
     dc.SelectObject(&cameraBrush);
     dc.Ellipse(CRect(
-        clientRect.right - m_bezel / 2 - Scale(3),
+        clientRect.right - (m_bezel + m_ownerInsetRight) / 2 - Scale(3),
         clientRect.CenterPoint().y - Scale(3),
-        clientRect.right - m_bezel / 2 + Scale(3),
+        clientRect.right - (m_bezel + m_ownerInsetRight) / 2 + Scale(3),
         clientRect.CenterPoint().y + Scale(3)));
     dc.RoundRect(CRect(
-        m_bezel / 2 - Scale(2),
+        (m_bezel + m_ownerInsetLeft) / 2 - Scale(2),
         clientRect.CenterPoint().y - Scale(22),
-        m_bezel / 2 + Scale(2),
+        (m_bezel + m_ownerInsetLeft) / 2 + Scale(2),
         clientRect.CenterPoint().y + Scale(22)),
         CPoint(Scale(3), Scale(3)));
 
@@ -242,13 +259,13 @@ UINT CTabletFrameWnd::ResizeHitTest(CPoint point) const
     CRect clientRect;
     GetClientRect(clientRect);
 
-    const bool left = point.x < m_bezel;
-    const bool right = point.x >= clientRect.right - m_bezel;
+    const bool left = point.x < m_bezel + m_ownerInsetLeft;
+    const bool right = point.x >= clientRect.right - m_bezel - m_ownerInsetRight;
     // Keep most of the upper bezel draggable while reserving its outer edge
     // for vertical resizing.
     const bool top = point.y >= m_hardwareHeight
                      && point.y < m_hardwareHeight + Scale(5);
-    const bool bottom = point.y >= clientRect.bottom - m_bezel;
+    const bool bottom = point.y >= clientRect.bottom - m_bezel - m_ownerInsetBottom;
 
     if (top && left) return HTTOPLEFT;
     if (top && right) return HTTOPRIGHT;

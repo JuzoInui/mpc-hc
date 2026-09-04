@@ -24,10 +24,13 @@ protected:
 private:
     CWnd* m_pOwner = nullptr;
     int m_scale = 100;
-    int m_bezel = 20;
+    int m_bezel = 12;
     int m_hardwareHeight = 9;
     int m_cornerRadius = 30;
     int m_strokeWidth = 2;
+    int m_ownerInsetLeft = 0;
+    int m_ownerInsetRight = 0;
+    int m_ownerInsetBottom = 0;
 
     CRect m_volumeButtonRect;
     CRect m_playButtonRect;
