@@ -29,6 +29,15 @@ jobs:
           New-Item -ItemType Directory -Force $mingwCompat | Out-Null
           Copy-Item "C:\msys64\mingw64\lib\libmingwex.a" $mingwCompat -Force
 
+          $gccVersion = (& C:\msys64\mingw64\bin\gcc.exe -dumpversion).Trim()
+          $gcc64 = "C:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\$gccVersion\libgcc.a"
+          $gcc32Compat = "C:\msys64\mingw64\lib\gcc\i686-w64-mingw32\$gccVersion"
+          $mingw32Compat = "C:\msys64\mingw64\i686-w64-mingw32\lib"
+          New-Item -ItemType Directory -Force $gcc32Compat | Out-Null
+          New-Item -ItemType Directory -Force $mingw32Compat | Out-Null
+          Copy-Item $gcc64 $gcc32Compat -Force
+          Copy-Item "C:\msys64\mingw64\lib\libmingwex.a" $mingw32Compat -Force
+
           $nasm = Get-Item "$env:ProgramFiles\NASM\nasm.exe" -ErrorAction SilentlyContinue
           $yasm = Get-Item "$env:ChocolateyInstall\lib\yasm\tools\yasm.exe" -ErrorAction SilentlyContinue
           if (-not $nasm -or -not $yasm) {
@@ -45,6 +54,10 @@ jobs:
 
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
+
+      - name: Prepare MinGW support libraries
+        shell: cmd
+        run: call update_mingwlib.bat
 
       - name: Select installed Windows 10 SDK
         shell: powershell
@@ -63,7 +76,7 @@ jobs:
         shell: cmd
         run: |
           call update_version.bat
-          msbuild mpc-hc.sln /nologo /m /t:Build /p:Configuration="Release Lite" /p:Platform=x64 /p:MPCHC_WINSDK_VER=%MPCHC_WINSDK_VER%
+          msbuild mpc-hc.sln /nologo /m /t:Build /p:Configuration="Release Lite" /p:Platform=x64 /p:MPCHC_WINSDK_VER=%MPCHC_WINSDK_VER% /p:SkipMingwLibUpdate=true
 
       - name: Collect portable player
         shell: powershell

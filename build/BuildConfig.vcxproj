@@ -42,7 +42,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <BaseIntermediateOutputPath>$(IntDir)</BaseIntermediateOutputPath>
-    <NMakeBuildCommandLine>..\update_mingwlib.bat</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine Condition="'$(SkipMingwLibUpdate)' != 'true'">..\update_mingwlib.bat</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine Condition="'$(SkipMingwLibUpdate)' == 'true'">..\update_version.bat --quiet</NMakeBuildCommandLine>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
