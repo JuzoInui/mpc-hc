@@ -25,10 +25,8 @@ jobs:
         run: |
           & C:\msys64\usr\bin\bash.exe -lc "pacman -S --needed --noconfirm make diffutils pkgconf mingw-w64-x86_64-gcc"
 
-          $nasm = Get-ChildItem "$env:ChocolateyInstall\lib\nasm" -Filter nasm.exe -Recurse |
-            Select-Object -First 1
-          $yasm = Get-ChildItem "$env:ChocolateyInstall\lib\yasm" -Filter yasm.exe -Recurse |
-            Select-Object -First 1
+          $nasm = Get-Item "$env:ProgramFiles\NASM\nasm.exe" -ErrorAction SilentlyContinue
+          $yasm = Get-Item "$env:ChocolateyInstall\lib\yasm\tools\yasm.exe" -ErrorAction SilentlyContinue
           if (-not $nasm -or -not $yasm) {
             throw "NASM or YASM executable was not found after installation."
           }
