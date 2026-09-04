@@ -81,18 +81,18 @@ jobs:
         shell: cmd
         run: |
           call update_version.bat
-          msbuild mpc-hc.sln /nologo /m /t:Build /p:Configuration="Release Lite" /p:Platform=x64 /p:MPCHC_WINSDK_VER=%MPCHC_WINSDK_VER% /p:SkipMingwLibUpdate=true
+          msbuild mpc-hc.sln /nologo /m /t:Build /p:Configuration="Release" /p:Platform=x64 /p:MPCHC_WINSDK_VER=%MPCHC_WINSDK_VER% /p:SkipMingwLibUpdate=true
 
       - name: Collect portable player
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force artifact
-          Copy-Item "bin\mpc-hc_x64 Lite\mpc-hc64.exe" artifact\
+          Copy-Item "bin\mpc-hc_x64\*" artifact\ -Recurse -Force
           Copy-Item TABLET_BUILD.md artifact\
 
       - name: Upload portable build
         uses: actions/upload-artifact@v4
         with:
-          name: mpc-hc-tablet-win10-x64
+          name: mpc-hc-tablet-full-win10-x64
           path: artifact
           if-no-files-found: error
