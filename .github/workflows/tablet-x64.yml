@@ -120,6 +120,16 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force artifact
           Copy-Item "bin\mpc-hc_x64\*" artifact\ -Recurse -Force
+
+          $lavRuntime = "artifact\LAVFilters64"
+          $runtimeDlls = @("zlib1.dll", "libgcc_s_seh-1.dll", "libwinpthread-1.dll")
+          foreach ($dll in $runtimeDlls) {
+            $source = "C:\msys64\mingw64\bin\$dll"
+            if (-not (Test-Path $source)) {
+              throw "Required LAV runtime dependency is missing: $source"
+            }
+            Copy-Item $source $lavRuntime -Force
+          }
           Copy-Item TABLET_BUILD.md artifact\
 
       - name: Upload portable build
