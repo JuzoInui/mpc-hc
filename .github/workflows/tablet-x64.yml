@@ -92,11 +92,17 @@ jobs:
         shell: powershell
         run: |
           $lavRoot = "src\thirdparty\LAVFilters\src"
-          $lavBase = (& git -C $lavRoot rev-list --max-parents=0 HEAD | Select-Object -First 1).Trim()
-          if (-not $lavBase) {
-            throw "Unable to determine the LAVFilters history root."
+          $versionScript = Join-Path $lavRoot "common\version.sh"
+          $patchedVersionScript = New-Object System.Collections.Generic.List[string]
+          foreach ($line in [System.IO.File]::ReadAllLines($versionScript)) {
+            $patchedVersionScript.Add($line)
+            if ($line.TrimStart().StartsWith('describe=$(git describe')) {
+              $patchedVersionScript.Add('  if [[ -z "$describe" ]]; then')
+              $patchedVersionScript.Add('    describe="0.0.0-0-g0000000"')
+              $patchedVersionScript.Add('  fi')
+            }
           }
-          & git -C $lavRoot tag --annotate --force tablet-build-base --message "CI build base" $lavBase
+          [System.IO.File]::WriteAllLines($versionScript, $patchedVersionScript, (New-Object System.Text.UTF8Encoding($false)))
 
           & msbuild src\thirdparty\freetype2\freetype2.vcxproj /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /p:MPCHC_WINSDK_VER=$env:MPCHC_WINSDK_VER
           if ($LASTEXITCODE -ne 0) {
