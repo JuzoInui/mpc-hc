@@ -92,9 +92,9 @@ void CTabletFrameWnd::SyncToOwner(bool showFrame)
     CRect ownerClientRect;
     m_pOwner->GetClientRect(ownerClientRect);
     m_pOwner->ClientToScreen(ownerClientRect);
-    m_ownerInsetLeft = std::max(0, ownerClientRect.left - ownerRect.left);
-    m_ownerInsetRight = std::max(0, ownerRect.right - ownerClientRect.right);
-    m_ownerInsetBottom = std::max(0, ownerRect.bottom - ownerClientRect.bottom);
+    m_ownerInsetLeft = std::max<LONG>(0, ownerClientRect.left - ownerRect.left);
+    m_ownerInsetRight = std::max<LONG>(0, ownerRect.right - ownerClientRect.right);
+    m_ownerInsetBottom = std::max<LONG>(0, ownerRect.bottom - ownerClientRect.bottom);
 
     const CRect frameRect(
         ownerRect.left - m_bezel,
